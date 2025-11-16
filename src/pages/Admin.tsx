@@ -8,7 +8,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { LineChart, Line, PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from "recharts";
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  Legend,
+} from "recharts";
 
 const CHART_COLORS = {
   primary: "hsl(217 91% 60%)",
@@ -48,12 +62,40 @@ const mockBarData = [
 ];
 
 const mockCitizens = [
-  { id: "C-2024-001", area: "Κέντρο Αθήνας", age: 42, risk: "Υψηλός", cause: "Απώλεια Εργασίας", support: "Οικονομική Βοήθεια" },
-  { id: "C-2024-002", area: "Εξάρχεια", age: 35, risk: "Μέτριος", cause: "Οικονομικά Προβλήματα", support: "Συμβουλευτική" },
+  {
+    id: "C-2024-001",
+    area: "Κέντρο Αθήνας",
+    age: 42,
+    risk: "Υψηλός",
+    cause: "Απώλεια Εργασίας",
+    support: "Οικονομική Βοήθεια",
+  },
+  {
+    id: "C-2024-002",
+    area: "Εξάρχεια",
+    age: 35,
+    risk: "Μέτριος",
+    cause: "Οικονομικά Προβλήματα",
+    support: "Συμβουλευτική",
+  },
   { id: "C-2024-003", area: "Κυψέλη", age: 58, risk: "Υψηλός", cause: "Υγεία/Αναπηρία", support: "Ιατρική Φροντίδα" },
   { id: "C-2024-004", area: "Παγκράτι", age: 29, risk: "Χαμηλός", cause: "Οικογενειακά Θέματα", support: "Στέγαση" },
-  { id: "C-2024-005", area: "Πατήσια", age: 51, risk: "Υψηλός", cause: "Απώλεια Εργασίας", support: "Επαγγελματική Κατάρτιση" },
-  { id: "C-2024-006", area: "Κολωνάκι", age: 38, risk: "Μέτριος", cause: "Οικονομικά Προβλήματα", support: "Οικονομική Βοήθεια" },
+  {
+    id: "C-2024-005",
+    area: "Πατήσια",
+    age: 51,
+    risk: "Υψηλός",
+    cause: "Απώλεια Εργασίας",
+    support: "Επαγγελματική Κατάρτιση",
+  },
+  {
+    id: "C-2024-006",
+    area: "Κολωνάκι",
+    age: 38,
+    risk: "Μέτριος",
+    cause: "Οικονομικά Προβλήματα",
+    support: "Οικονομική Βοήθεια",
+  },
   { id: "C-2024-007", area: "Γκάζι", age: 45, risk: "Μέτριος", cause: "Απώλεια Εργασίας", support: "Συμβουλευτική" },
   { id: "C-2024-008", area: "Πετράλωνα", age: 33, risk: "Υψηλός", cause: "Στέγαση", support: "Κοινωνικό Παντοπωλείο" },
 ];
@@ -73,21 +115,25 @@ const Admin = () => {
     return "success";
   };
 
-  const filteredCitizens = mockCitizens.filter(citizen => {
+  const filteredCitizens = mockCitizens.filter((citizen) => {
     const matchesFilter = filter === "Όλοι" || citizen.risk === filter;
-    const matchesSearch = citizen.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         citizen.area.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      citizen.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      citizen.area.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
   const getAreaCitizens = (area: string) => {
-    return mockCitizens.filter(citizen => citizen.area === area);
+    return mockCitizens.filter((citizen) => citizen.area === area);
   };
 
   type AreaStat = { area: string; count: number; risk: string; topCause: string; topSupport: string };
   const areaStats: AreaStat[] = (() => {
-    const priority: Record<string, number> = { "Υψηλός": 3, "Μέτριος": 2, "Χαμηλός": 1 };
-    const map = new Map<string, { count: number; risk: string; causes: Record<string, number>; supports: Record<string, number> }>();
+    const priority: Record<string, number> = { Υψηλός: 3, Μέτριος: 2, Χαμηλός: 1 };
+    const map = new Map<
+      string,
+      { count: number; risk: string; causes: Record<string, number>; supports: Record<string, number> }
+    >();
     for (const c of mockCitizens) {
       const entry = map.get(c.area) ?? { count: 0, risk: "Χαμηλός", causes: {}, supports: {} };
       entry.count += 1;
@@ -100,12 +146,12 @@ const Admin = () => {
       area,
       count: v.count,
       risk: v.risk,
-      topCause: Object.entries(v.causes).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? "-",
-      topSupport: Object.entries(v.supports).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? "-",
+      topCause: Object.entries(v.causes).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "-",
+      topSupport: Object.entries(v.supports).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "-",
     }));
   })();
 
-  const areaStatsFiltered = areaStats.filter(a => {
+  const areaStatsFiltered = areaStats.filter((a) => {
     const matchesFilter = filter === "Όλοι" || a.risk === filter;
     const matchesSearch = a.area.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
@@ -115,14 +161,14 @@ const Admin = () => {
       toast({
         title: "Σφάλμα",
         description: "Παρακαλώ συμπληρώστε όλα τα πεδία",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
-    const citizen = mockCitizens.find(c => c.id === selectedCitizen);
+    const citizen = mockCitizens.find((c) => c.id === selectedCitizen);
     const methodText = sendMethod === "sms" ? "SMS" : sendMethod === "push" ? "Push Notification" : "Γράμμα";
-    
+
     toast({
       title: "Επιτυχής Αποστολή",
       description: `Στάλθηκε ${assistanceType} μέσω ${methodText} στον πολίτη ${selectedCitizen}`,
@@ -143,359 +189,299 @@ const Admin = () => {
         <div className="relative bg-slate-950 rounded-2xl border-[12px] border-slate-900 overflow-hidden shadow-2xl">
           {/* Thin camera notch */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-slate-800 rounded-b-md z-50" />
-          
+
           {/* Screen Content with aspect ratio */}
-          <div className="bg-background overflow-y-auto" style={{ height: 'calc(100vh - 220px)', maxHeight: '920px' }}>
+          <div className="bg-background overflow-y-auto" style={{ height: "calc(100vh - 220px)", maxHeight: "920px" }}>
             <div className="p-4 md:p-8">
               <div className="max-w-[1400px] mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Σύστημα Παρακολούθησης Ευάλωτων Πολιτών</h1>
-              <p className="text-sm text-muted-foreground">Δήμος Αθηναίων</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon">
-              <Bell className="w-5 h-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <span className="text-lg">ΔΑ</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Λίστα Περιοχών σε Κίνδυνο (πάνω-πάνω) */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Λίστα Περιοχών σε Κίνδυνο</CardTitle>
-                <CardDescription>8 από 8 περιοχές</CardDescription>
-              </div>
-              <Button variant="default" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Εξαγωγή
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4 mb-6">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Αναζήτηση με περιοχή..." 
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Όλοι">Όλοι</SelectItem>
-                  <SelectItem value="Υψηλός">Υψηλός</SelectItem>
-                  <SelectItem value="Μέτριος">Μέτριος</SelectItem>
-                  <SelectItem value="Χαμηλός">Χαμηλός</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Περιοχή</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Άτομα</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Επίπεδο Κινδύνου</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Κύρια Αιτία</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Υποστήριξη</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {areaStatsFiltered.map((row) => (
-                    <tr 
-                      key={row.area} 
-                      className="border-b hover:bg-muted/50 transition-colors cursor-pointer"
-                      onClick={() => setSelectedArea(row.area)}
-                    >
-                      <td className="py-3 px-4 text-sm font-medium">{row.area}</td>
-                      <td className="py-3 px-4 text-sm">{row.count}</td>
-                      <td className="py-3 px-4">
-                        <Badge variant={getRiskBadgeVariant(row.risk)}>
-                          {row.risk}
-                        </Badge>
-                      </td>
-                      <td className="py-3 px-4 text-sm">{row.topCause}</td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">{row.topSupport}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Σύνολο Ατόμων σε Κίνδυνο</p>
-                  <p className="text-3xl font-bold">2,847</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    από <span className="text-status-high">+12%</span> τον προηγ. μήνα
-                  </p>
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+                      <Users className="w-6 h-6 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h1 className="text-2xl font-bold text-foreground">Σύστημα Παρακολούθησης Ευάλωτων Πολιτών</h1>
+                      <p className="text-sm text-muted-foreground">Δήμος Αθηναίων</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon">
+                      <Bell className="w-5 h-5" />
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                      <span className="text-lg">ΔΑ</span>
+                    </Button>
+                  </div>
                 </div>
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-primary" />
+
+                {/* Λίστα Περιοχών σε Κίνδυνο (πάνω-πάνω) */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Λίστα Περιοχών σε Κίνδυνο</CardTitle>
+                        <CardDescription>8 από 8 περιοχές</CardDescription>
+                      </div>
+                      <Button variant="default" size="sm">
+                        <Download className="w-4 h-4 mr-2" />
+                        Εξαγωγή
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex gap-4 mb-6">
+                      <div className="flex-1 relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Αναζήτηση με περιοχή..."
+                          className="pl-10"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
+                      <Select value={filter} onValueChange={setFilter}>
+                        <SelectTrigger className="w-[180px]">
+                          <Filter className="w-4 h-4 mr-2" />
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Όλοι">Όλοι</SelectItem>
+                          <SelectItem value="Υψηλός">Υψηλός</SelectItem>
+                          <SelectItem value="Μέτριος">Μέτριος</SelectItem>
+                          <SelectItem value="Χαμηλός">Χαμηλός</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Περιοχή</th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Άτομα</th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                              Επίπεδο Κινδύνου
+                            </th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                              Κύρια Αιτία
+                            </th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                              Υποστήριξη
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {areaStatsFiltered.map((row) => (
+                            <tr
+                              key={row.area}
+                              className="border-b hover:bg-muted/50 transition-colors cursor-pointer"
+                              onClick={() => setSelectedArea(row.area)}
+                            >
+                              <td className="py-3 px-4 text-sm font-medium">{row.area}</td>
+                              <td className="py-3 px-4 text-sm">{row.count}</td>
+                              <td className="py-3 px-4">
+                                <Badge variant={getRiskBadgeVariant(row.risk)}>{row.risk}</Badge>
+                              </td>
+                              <td className="py-3 px-4 text-sm">{row.topCause}</td>
+                              <td className="py-3 px-4 text-sm text-muted-foreground">{row.topSupport}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Σύνολο Ατόμων σε Κίνδυνο</p>
+                          <p className="text-3xl font-bold">2,847</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            από <span className="text-status-high">+12%</span> τον προηγ. μήνα
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                          <Users className="w-6 h-6 text-primary" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Περιοχές Υψηλού Κινδύνου</p>
+                          <p className="text-3xl font-bold">8</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            από <span className="text-status-high">+2</span> τον προηγ. μήνα
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 bg-status-high/10 rounded-xl flex items-center justify-center">
+                          <AlertTriangle className="w-6 h-6 text-status-high" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Ενεργές Περιπτώσεις</p>
+                          <p className="text-3xl font-bold">438</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            από <span className="text-status-warning">+8%</span> τον προηγ. μήνα
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 bg-status-warning/10 rounded-xl flex items-center justify-center">
+                          <TrendingUp className="w-6 h-6 text-status-warning" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">Ολοκληρωμένες Υποστηρίξεις</p>
+                          <p className="text-3xl font-bold">1,206</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            από <span className="text-status-low">+9%</span> τον προηγ. μήνα
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 bg-status-low/10 rounded-xl flex items-center justify-center">
+                          <CheckCircle className="w-6 h-6 text-status-low" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Περιοχές Υψηλού Κινδύνου</p>
-                  <p className="text-3xl font-bold">8</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    από <span className="text-status-high">+2</span> τον προηγ. μήνα
-                  </p>
+                {/* Charts Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Trend Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Τάση Ατόμων σε Κίνδυνο</CardTitle>
+                      <CardDescription>Εξέλιξη τελευταίων 6 μηνών</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex gap-4 mb-4">
+                        <Button variant="secondary" size="sm">
+                          Εβδ.
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          Μήνας
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          Έτος
+                        </Button>
+                      </div>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={mockTrendData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                          <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                          <YAxis stroke="hsl(var(--muted-foreground))" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: "hsl(var(--card))",
+                              border: "1px solid hsl(var(--border))",
+                              borderRadius: "8px",
+                            }}
+                          />
+                          <Legend />
+                          <Line
+                            type="monotone"
+                            dataKey="moderate"
+                            name="Μέτριος Κίνδυνος"
+                            stroke={CHART_COLORS.warning}
+                            strokeWidth={2}
+                            dot={{ fill: CHART_COLORS.warning }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="high"
+                            name="Υψηλός Κίνδυνος"
+                            stroke={CHART_COLORS.danger}
+                            strokeWidth={2}
+                            dot={{ fill: CHART_COLORS.danger }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  {/* Pie Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Αιτίες Κινδύνου</CardTitle>
+                      <CardDescription>Κατανομή κύριων αιτιών</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={mockPieData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                            outerRadius={100}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {mockPieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="w-12 h-12 bg-status-high/10 rounded-xl flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-status-high" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Ενεργές Περιπτώσεις</p>
-                  <p className="text-3xl font-bold">438</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    από <span className="text-status-warning">+8%</span> τον προηγ. μήνα
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-status-warning/10 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-status-warning" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Ολοκληρωμένες Υποστηρίξεις</p>
-                  <p className="text-3xl font-bold">1,206</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    από <span className="text-status-low">+9%</span> τον προηγ. μήνα
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-status-low/10 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-status-low" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Trend Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Τάση Ατόμων σε Κίνδυνο</CardTitle>
-              <CardDescription>Εξέλιξη τελευταίων 6 μηνών</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4 mb-4">
-                <Button variant="secondary" size="sm">Εβδ.</Button>
-                <Button variant="ghost" size="sm">Μήνας</Button>
-                <Button variant="ghost" size="sm">Έτος</Button>
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={mockTrendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: "hsl(var(--card))", 
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px"
-                    }} 
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="moderate" 
-                    name="Μέτριος Κίνδυνος"
-                    stroke={CHART_COLORS.warning} 
-                    strokeWidth={2}
-                    dot={{ fill: CHART_COLORS.warning }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="high" 
-                    name="Υψηλός Κίνδυνος"
-                    stroke={CHART_COLORS.danger} 
-                    strokeWidth={2}
-                    dot={{ fill: CHART_COLORS.danger }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Pie Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Αιτίες Κινδύνου</CardTitle>
-              <CardDescription>Κατανομή κύριων αιτιών</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={mockPieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {mockPieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Bar Chart - Areas List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Λίστα Περιοχών σε Κίνδυνο</CardTitle>
-            <CardDescription>Κάντε κλικ σε μία περιοχή για να δείτε τους πολίτες και να στείλετε βοήθεια</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart 
-                data={mockBarData}
-                onClick={(data) => {
-                  if (data && data.activePayload && data.activePayload[0]) {
-                    setSelectedArea(data.activePayload[0].payload.area);
-                  }
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="area" stroke="hsl(var(--muted-foreground))" />
-                <YAxis stroke="hsl(var(--muted-foreground))" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: "hsl(var(--card))", 
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px"
-                  }} 
-                />
-                <Bar dataKey="count" fill={CHART_COLORS.primary} radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Citizens Table */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Λίστα Περιοχών σε Κίνδυνο</CardTitle>
-                <CardDescription>8 από 8 περιοχές</CardDescription>
-              </div>
-              <Button variant="default" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Εξαγωγή
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4 mb-6">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Αναζήτηση με περιοχή ή κωδικό..." 
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Όλοι">Όλοι</SelectItem>
-                  <SelectItem value="Υψηλός">Υψηλός</SelectItem>
-                  <SelectItem value="Μέτριος">Μέτριος</SelectItem>
-                  <SelectItem value="Χαμηλός">Χαμηλός</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Κωδικός</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Περιοχή</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Άτομα</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Επίπεδο Κινδύνου</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Κύρια Αιτία</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Υποστήριξη</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredCitizens.map((citizen) => (
-                    <tr key={citizen.id} className="border-b hover:bg-muted/50 transition-colors">
-                      <td className="py-3 px-4 text-sm font-medium">{citizen.id}</td>
-                      <td className="py-3 px-4 text-sm">{citizen.area}</td>
-                      <td className="py-3 px-4 text-sm">{citizen.age}</td>
-                      <td className="py-3 px-4">
-                        <Badge variant={getRiskBadgeVariant(citizen.risk)}>
-                          {citizen.risk}
-                        </Badge>
-                      </td>
-                      <td className="py-3 px-4 text-sm">{citizen.cause}</td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">{citizen.support}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                {/* Bar Chart - Areas List */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Λίστα Περιοχών σε Κίνδυνο</CardTitle>
+                    <CardDescription>
+                      Κάντε κλικ σε μία περιοχή για να δείτε τους πολίτες και να στείλετε βοήθεια
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={350}>
+                      <BarChart
+                        data={mockBarData}
+                        onClick={(data) => {
+                          if (data && data.activePayload && data.activePayload[0]) {
+                            setSelectedArea(data.activePayload[0].payload.area);
+                          }
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="area" stroke="hsl(var(--muted-foreground))" />
+                        <YAxis stroke="hsl(var(--muted-foreground))" />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                          }}
+                        />
+                        <Bar dataKey="count" fill={CHART_COLORS.primary} radius={[8, 8, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
@@ -505,40 +491,35 @@ const Admin = () => {
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Πολίτες σε Κίνδυνο - {selectedArea}</DialogTitle>
-                <DialogDescription>
-                  Ανωνυμοποιημένα δεδομένα πολιτών για αποστολή βοήθειας
-                </DialogDescription>
+                <DialogDescription>Ανωνυμοποιημένα δεδομένα πολιτών για αποστολή βοήθειας</DialogDescription>
               </DialogHeader>
-              
+
               <div className="space-y-4 mt-4">
-                {selectedArea && getAreaCitizens(selectedArea).map((citizen) => (
-                  <Card 
-                    key={citizen.id}
-                    className={`cursor-pointer transition-all ${
-                      selectedCitizen === citizen.id ? 'ring-2 ring-primary' : ''
-                    }`}
-                    onClick={() => setSelectedCitizen(citizen.id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-3">
-                            <span className="font-mono font-semibold">{citizen.id}</span>
-                            <Badge variant={getRiskBadgeVariant(citizen.risk)}>
-                              {citizen.risk}
-                            </Badge>
+                {selectedArea &&
+                  getAreaCitizens(selectedArea).map((citizen) => (
+                    <Card
+                      key={citizen.id}
+                      className={`cursor-pointer transition-all ${
+                        selectedCitizen === citizen.id ? "ring-2 ring-primary" : ""
+                      }`}
+                      onClick={() => setSelectedCitizen(citizen.id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-3">
+                              <span className="font-mono font-semibold">{citizen.id}</span>
+                              <Badge variant={getRiskBadgeVariant(citizen.risk)}>{citizen.risk}</Badge>
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              Ηλικία: {citizen.age} | Αιτία: {citizen.cause}
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground">
-                            Ηλικία: {citizen.age} | Αιτία: {citizen.cause}
-                          </div>
+                          {selectedCitizen === citizen.id && <CheckCircle className="w-5 h-5 text-primary" />}
                         </div>
-                        {selectedCitizen === citizen.id && (
-                          <CheckCircle className="w-5 h-5 text-primary" />
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
 
                 {selectedCitizen && (
                   <div className="space-y-4 pt-4 border-t">
@@ -573,11 +554,7 @@ const Admin = () => {
                       </Select>
                     </div>
 
-                    <Button 
-                      className="w-full" 
-                      onClick={handleSendAssistance}
-                      disabled={!assistanceType || !sendMethod}
-                    >
+                    <Button className="w-full" onClick={handleSendAssistance} disabled={!assistanceType || !sendMethod}>
                       <Send className="w-4 h-4 mr-2" />
                       Αποστολή Ειδοποίησης
                     </Button>
@@ -591,14 +568,14 @@ const Admin = () => {
             </DialogContent>
           </Dialog>
         </div>
-        
+
         {/* Monitor Stand Neck */}
         <div className="flex justify-center">
           <div className="w-32 h-16 bg-gradient-to-b from-slate-800 to-slate-700 relative">
             <div className="absolute inset-x-0 top-0 h-1 bg-slate-900" />
           </div>
         </div>
-        
+
         {/* Monitor Base/Stand */}
         <div className="flex justify-center">
           <div className="w-96 h-8 bg-gradient-to-b from-slate-700 to-slate-600 rounded-full shadow-2xl relative">
