@@ -84,6 +84,32 @@ const Admin = () => {
     return mockCitizens.filter(citizen => citizen.area === area);
   };
 
+  type AreaStat = { area: string; count: number; risk: string; topCause: string; topSupport: string };
+  const areaStats: AreaStat[] = (() => {
+    const priority: Record<string, number> = { "Υψηλός": 3, "Μέτριος": 2, "Χαμηλός": 1 };
+    const map = new Map<string, { count: number; risk: string; causes: Record<string, number>; supports: Record<string, number> }>();
+    for (const c of mockCitizens) {
+      const entry = map.get(c.area) ?? { count: 0, risk: "Χαμηλός", causes: {}, supports: {} };
+      entry.count += 1;
+      if (priority[c.risk] > priority[entry.risk]) entry.risk = c.risk;
+      entry.causes[c.cause] = (entry.causes[c.cause] ?? 0) + 1;
+      entry.supports[c.support] = (entry.supports[c.support] ?? 0) + 1;
+      map.set(c.area, entry);
+    }
+    return Array.from(map.entries()).map(([area, v]) => ({
+      area,
+      count: v.count,
+      risk: v.risk,
+      topCause: Object.entries(v.causes).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? "-",
+      topSupport: Object.entries(v.supports).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? "-",
+    }));
+  })();
+
+  const areaStatsFiltered = areaStats.filter(a => {
+    const matchesFilter = filter === "Όλοι" || a.risk === filter;
+    const matchesSearch = a.area.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
   const handleSendAssistance = () => {
     if (!selectedCitizen || !assistanceType || !sendMethod) {
       toast({
@@ -142,6 +168,80 @@ const Admin = () => {
             </Button>
           </div>
         </div>
+
+        {/* Λίστα Περιοχών σε Κίνδυνο (πάνω-πάνω) */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Λίστα Περιοχών σε Κίνδυνο</CardTitle>
+                <CardDescription>8 από 8 περιοχές</CardDescription>
+              </div>
+              <Button variant="default" size="sm">
+                <Download className="w-4 h-4 mr-2" />
+                Εξαγωγή
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4 mb-6">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Αναζήτηση με περιοχή..." 
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Όλοι">Όλοι</SelectItem>
+                  <SelectItem value="Υψηλός">Υψηλός</SelectItem>
+                  <SelectItem value="Μέτριος">Μέτριος</SelectItem>
+                  <SelectItem value="Χαμηλός">Χαμηλός</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Περιοχή</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Άτομα</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Επίπεδο Κινδύνου</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Κύρια Αιτία</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Υποστήριξη</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {areaStatsFiltered.map((row) => (
+                    <tr 
+                      key={row.area} 
+                      className="border-b hover:bg-muted/50 transition-colors cursor-pointer"
+                      onClick={() => setSelectedArea(row.area)}
+                    >
+                      <td className="py-3 px-4 text-sm font-medium">{row.area}</td>
+                      <td className="py-3 px-4 text-sm">{row.count}</td>
+                      <td className="py-3 px-4">
+                        <Badge variant={getRiskBadgeVariant(row.risk)}>
+                          {row.risk}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-sm">{row.topCause}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{row.topSupport}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
