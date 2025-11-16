@@ -73,16 +73,16 @@ const Admin = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-8">
-      {/* Laptop Frame */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-8">
+      {/* Desktop Monitor Frame */}
       <div className="relative w-full max-w-[1600px]">
-        {/* Screen */}
-        <div className="relative bg-slate-950 rounded-t-2xl border-8 border-slate-800 overflow-hidden shadow-2xl">
-          {/* Notch/Camera */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-700 rounded-b-lg z-50" />
+        {/* Monitor Screen */}
+        <div className="relative bg-slate-950 rounded-2xl border-[12px] border-slate-900 overflow-hidden shadow-2xl">
+          {/* Thin camera notch */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-slate-800 rounded-b-md z-50" />
           
-          {/* Screen Content */}
-          <div className="bg-background overflow-y-auto" style={{ height: 'calc(100vh - 200px)', maxHeight: '900px' }}>
+          {/* Screen Content with aspect ratio */}
+          <div className="bg-background overflow-y-auto" style={{ height: 'calc(100vh - 220px)', maxHeight: '920px' }}>
             <div className="p-4 md:p-8">
               <div className="max-w-[1400px] mx-auto space-y-8">
         {/* Header */}
@@ -356,13 +356,19 @@ const Admin = () => {
           </div>
         </div>
         
-        {/* Laptop Base */}
-        <div className="relative h-6 bg-gradient-to-b from-slate-700 to-slate-800 rounded-b-3xl">
-          <div className="absolute inset-x-0 top-0 h-1 bg-slate-600" />
+        {/* Monitor Stand Neck */}
+        <div className="flex justify-center">
+          <div className="w-32 h-16 bg-gradient-to-b from-slate-800 to-slate-700 relative">
+            <div className="absolute inset-x-0 top-0 h-1 bg-slate-900" />
+          </div>
         </div>
         
-        {/* Laptop Bottom */}
-        <div className="h-3 bg-slate-800 rounded-b-xl mx-8 shadow-lg" />
+        {/* Monitor Base/Stand */}
+        <div className="flex justify-center">
+          <div className="w-96 h-8 bg-gradient-to-b from-slate-700 to-slate-600 rounded-full shadow-2xl relative">
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-800/30 to-transparent rounded-full" />
+          </div>
+        </div>
       </div>
     </div>
   );
