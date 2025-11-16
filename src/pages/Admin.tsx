@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Users, AlertTriangle, TrendingUp, CheckCircle, Bell, Download, Search, Filter } from "lucide-react";
+import { Users, AlertTriangle, TrendingUp, CheckCircle, Bell, Download, Search, Filter, Send } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { LineChart, Line, PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from "recharts";
 
 const CHART_COLORS = {
@@ -58,6 +61,11 @@ const mockCitizens = [
 const Admin = () => {
   const [filter, setFilter] = useState("Όλοι");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [selectedCitizen, setSelectedCitizen] = useState<string | null>(null);
+  const [assistanceType, setAssistanceType] = useState("");
+  const [sendMethod, setSendMethod] = useState("");
+  const { toast } = useToast();
 
   const getRiskBadgeVariant = (risk: string) => {
     if (risk === "Υψηλός") return "destructive";
@@ -71,6 +79,35 @@ const Admin = () => {
                          citizen.area.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+
+  const getAreaCitizens = (area: string) => {
+    return mockCitizens.filter(citizen => citizen.area === area);
+  };
+
+  const handleSendAssistance = () => {
+    if (!selectedCitizen || !assistanceType || !sendMethod) {
+      toast({
+        title: "Σφάλμα",
+        description: "Παρακαλώ συμπληρώστε όλα τα πεδία",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const citizen = mockCitizens.find(c => c.id === selectedCitizen);
+    const methodText = sendMethod === "sms" ? "SMS" : sendMethod === "push" ? "Push Notification" : "Γράμμα";
+    
+    toast({
+      title: "Επιτυχής Αποστολή",
+      description: `Στάλθηκε ${assistanceType} μέσω ${methodText} στον πολίτη ${selectedCitizen}`,
+    });
+
+    // Reset form
+    setSelectedCitizen(null);
+    setAssistanceType("");
+    setSendMethod("");
+    setSelectedArea(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-8">
@@ -263,7 +300,15 @@ const Admin = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={mockBarData}>
+              <BarChart 
+                data={mockBarData}
+                onClick={(data) => {
+                  if (data && data.activePayload && data.activePayload[0]) {
+                    setSelectedArea(data.activePayload[0].payload.area);
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="area" stroke="hsl(var(--muted-foreground))" />
                 <YAxis stroke="hsl(var(--muted-foreground))" />
@@ -354,6 +399,97 @@ const Admin = () => {
               </div>
             </div>
           </div>
+
+          {/* Area Citizens Dialog */}
+          <Dialog open={!!selectedArea} onOpenChange={() => setSelectedArea(null)}>
+            <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Πολίτες σε Κίνδυνο - {selectedArea}</DialogTitle>
+                <DialogDescription>
+                  Ανωνυμοποιημένα δεδομένα πολιτών για αποστολή βοήθειας
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 mt-4">
+                {selectedArea && getAreaCitizens(selectedArea).map((citizen) => (
+                  <Card 
+                    key={citizen.id}
+                    className={`cursor-pointer transition-all ${
+                      selectedCitizen === citizen.id ? 'ring-2 ring-primary' : ''
+                    }`}
+                    onClick={() => setSelectedCitizen(citizen.id)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono font-semibold">{citizen.id}</span>
+                            <Badge variant={getRiskBadgeVariant(citizen.risk)}>
+                              {citizen.risk}
+                            </Badge>
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Ηλικία: {citizen.age} | Αιτία: {citizen.cause}
+                          </div>
+                        </div>
+                        {selectedCitizen === citizen.id && (
+                          <CheckCircle className="w-5 h-5 text-primary" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
+                {selectedCitizen && (
+                  <div className="space-y-4 pt-4 border-t">
+                    <div>
+                      <Label htmlFor="assistance">Τύπος Βοήθειας</Label>
+                      <Select value={assistanceType} onValueChange={setAssistanceType}>
+                        <SelectTrigger id="assistance">
+                          <SelectValue placeholder="Επιλέξτε τύπο βοήθειας" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Οικονομική Βοήθεια">Οικονομική Βοήθεια</SelectItem>
+                          <SelectItem value="Επίδομα Στέγασης">Επίδομα Στέγασης</SelectItem>
+                          <SelectItem value="Επίδομα Ανεργίας">Επίδομα Ανεργίας</SelectItem>
+                          <SelectItem value="Κοινωνικό Παντοπωλείο">Κοινωνικό Παντοπωλείο</SelectItem>
+                          <SelectItem value="Ιατρική Φροντίδα">Ιατρική Φροντίδα</SelectItem>
+                          <SelectItem value="Συμβουλευτική">Συμβουλευτική</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="method">Μέθοδος Αποστολής</Label>
+                      <Select value={sendMethod} onValueChange={setSendMethod}>
+                        <SelectTrigger id="method">
+                          <SelectValue placeholder="Επιλέξτε μέθοδο" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sms">SMS</SelectItem>
+                          <SelectItem value="push">Push Notification</SelectItem>
+                          <SelectItem value="letter">Γράμμα στη Διεύθυνση (Κρυπτογραφημένη)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button 
+                      className="w-full" 
+                      onClick={handleSendAssistance}
+                      disabled={!assistanceType || !sendMethod}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Αποστολή Ειδοποίησης
+                    </Button>
+
+                    <p className="text-xs text-muted-foreground text-center">
+                      Η διεύθυνση του πολίτη είναι κρυπτογραφημένη και δεν είναι ορατή στους διαχειριστές
+                    </p>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         
         {/* Monitor Stand Neck */}
