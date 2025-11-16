@@ -51,42 +51,49 @@ const mockPieData = [
 ];
 
 const mockBarData = [
-  { area: "Κέντρο", count: 362 },
-  { area: "Εξάρχεια", count: 268 },
-  { area: "Κυψέλη", count: 411 },
-  { area: "Παγκράτι", count: 205 },
-  { area: "Πατήσια", count: 620 },
-  { area: "Κολωνάκι", count: 158 },
-  { area: "Γκάζι", count: 295 },
-  { area: "Πετράλωνα", count: 228 },
+  { area: "Κέντρο", count: 28 },
+  { area: "Εξάρχεια", count: 18 },
+  { area: "Κυψέλη", count: 32 },
+  { area: "Παγκράτι", count: 12 },
+  { area: "Πατήσια", count: 25 },
+  { area: "Κολωνάκι", count: 8 },
+  { area: "Γκάζι", count: 22 },
+  { area: "Πετράλωνα", count: 15 },
 ];
 
 const generateCitizens = () => {
   const areas = [
-    { name: "Κέντρο", count: 362 },
-    { name: "Εξάρχεια", count: 268 },
-    { name: "Κυψέλη", count: 411 },
-    { name: "Παγκράτι", count: 205 },
-    { name: "Πατήσια", count: 620 },
-    { name: "Κολωνάκι", count: 158 },
-    { name: "Γκάζι", count: 295 },
-    { name: "Πετράλωνα", count: 228 },
+    { name: "Κέντρο", count: 28 },
+    { name: "Εξάρχεια", count: 18 },
+    { name: "Κυψέλη", count: 32 },
+    { name: "Παγκράτι", count: 12 },
+    { name: "Πατήσια", count: 25 },
+    { name: "Κολωνάκι", count: 8 },
+    { name: "Γκάζι", count: 22 },
+    { name: "Πετράλωνα", count: 15 },
   ];
   
-  const risks = ["Υψηλός", "Μέτριος", "Χαμηλός"];
-  const causes = ["Απώλεια Εργασίας", "Στέγαση", "Υγεία/Αναπηρία", "Οικογενειακά Θέματα", "Άλλο"];
-  const supports = ["Οικονομική Βοήθεια", "Συμβουλευτική", "Ιατρική Φροντίδα", "Στέγαση", "Επαγγελματική Κατάρτιση", "Κοινωνικό Παντοπωλείο"];
+  const causes = ["Στέγαση", "Στέγαση", "Στέγαση", "Απώλεια Εργασίας", "Υγεία/Αναπηρία", "Οικογενειακά Θέματα", "Άλλο"];
+  const supports = ["Στέγαση", "Οικονομική Βοήθεια", "Συμβουλευτική", "Ιατρική Φροντίδα", "Επαγγελματική Κατάρτιση", "Κοινωνικό Παντοπωλείο"];
   
   const citizens = [];
   let idCounter = 1;
   
   for (const area of areas) {
+    // Υπολογισμός risk level βάσει αριθμού ατόμων
+    let areaRisk = "Χαμηλός";
+    if (area.count > 25) {
+      areaRisk = "Υψηλός";
+    } else if (area.count >= 10) {
+      areaRisk = "Μέτριος";
+    }
+    
     for (let i = 0; i < area.count; i++) {
       citizens.push({
         id: `C-2024-${String(idCounter).padStart(4, '0')}`,
         area: area.name,
         age: Math.floor(Math.random() * 50) + 20,
-        risk: risks[Math.floor(Math.random() * risks.length)],
+        risk: areaRisk,
         cause: causes[Math.floor(Math.random() * causes.length)],
         support: supports[Math.floor(Math.random() * supports.length)],
       });
@@ -103,7 +110,14 @@ const Admin = () => {
   const [filter, setFilter] = useState("Όλοι");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
-  const [selectedCitizen, setSelectedCitizen] = useState<string | null>(null);
+  const [selectedCitizen, setSelectedCitizen] = useState<{
+    id: string;
+    area: string;
+    age: number;
+    risk: string;
+    cause: string;
+    support: string;
+  } | null>(null);
   const [assistanceType, setAssistanceType] = useState("");
   const [sendMethod, setSendMethod] = useState("");
   const { toast } = useToast();
@@ -165,19 +179,17 @@ const Admin = () => {
       return;
     }
 
-    const citizen = mockCitizens.find((c) => c.id === selectedCitizen);
     const methodText = sendMethod === "sms" ? "SMS" : sendMethod === "push" ? "Push Notification" : "Γράμμα";
 
     toast({
       title: "Επιτυχής Αποστολή",
-      description: `Στάλθηκε ${assistanceType} μέσω ${methodText} στον πολίτη ${selectedCitizen}`,
+      description: `Στάλθηκε ${assistanceType} μέσω ${methodText} στον πολίτη ${selectedCitizen.id}`,
     });
 
     // Reset form
     setSelectedCitizen(null);
     setAssistanceType("");
     setSendMethod("");
-    setSelectedArea(null);
   };
 
   return (
@@ -490,7 +502,7 @@ const Admin = () => {
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Πολίτες σε Κίνδυνο - {selectedArea}</DialogTitle>
-                <DialogDescription>Ανωνυμοποιημένα δεδομένα πολιτών για αποστολή βοήθειας</DialogDescription>
+                <DialogDescription>Κάντε κλικ σε έναν πολίτη για να στείλετε εξατομικευμένη βοήθεια</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4 mt-4">
@@ -498,10 +510,8 @@ const Admin = () => {
                   getAreaCitizens(selectedArea).map((citizen) => (
                     <Card
                       key={citizen.id}
-                      className={`cursor-pointer transition-all ${
-                        selectedCitizen === citizen.id ? "ring-2 ring-primary" : ""
-                      }`}
-                      onClick={() => setSelectedCitizen(citizen.id)}
+                      className="cursor-pointer transition-all hover:bg-accent"
+                      onClick={() => setSelectedCitizen(citizen)}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -514,55 +524,81 @@ const Admin = () => {
                               Ηλικία: {citizen.age} | Αιτία: {citizen.cause}
                             </div>
                           </div>
-                          {selectedCitizen === citizen.id && <CheckCircle className="w-5 h-5 text-primary" />}
                         </div>
                       </CardContent>
                     </Card>
                   ))}
+              </div>
+            </DialogContent>
+          </Dialog>
 
-                {selectedCitizen && (
-                  <div className="space-y-4 pt-4 border-t">
-                    <div>
-                      <Label htmlFor="assistance">Τύπος Βοήθειας</Label>
-                      <Select value={assistanceType} onValueChange={setAssistanceType}>
-                        <SelectTrigger id="assistance">
-                          <SelectValue placeholder="Επιλέξτε τύπο βοήθειας" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Οικονομική Βοήθεια">Οικονομική Βοήθεια</SelectItem>
-                          <SelectItem value="Επίδομα Στέγασης">Επίδομα Στέγασης</SelectItem>
-                          <SelectItem value="Επίδομα Ανεργίας">Επίδομα Ανεργίας</SelectItem>
-                          <SelectItem value="Κοινωνικό Παντοπωλείο">Κοινωνικό Παντοπωλείο</SelectItem>
-                          <SelectItem value="Ιατρική Φροντίδα">Ιατρική Φροντίδα</SelectItem>
-                          <SelectItem value="Συμβουλευτική">Συμβουλευτική</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+          {/* Individual Citizen Dialog */}
+          <Dialog open={!!selectedCitizen} onOpenChange={() => setSelectedCitizen(null)}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Αποστολή Εξατομικευμένης Βοήθειας</DialogTitle>
+                <DialogDescription>
+                  Πολίτης: {selectedCitizen?.id} | Περιοχή: {selectedCitizen?.area}
+                </DialogDescription>
+              </DialogHeader>
 
-                    <div>
-                      <Label htmlFor="method">Μέθοδος Αποστολής</Label>
-                      <Select value={sendMethod} onValueChange={setSendMethod}>
-                        <SelectTrigger id="method">
-                          <SelectValue placeholder="Επιλέξτε μέθοδο" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="sms">SMS</SelectItem>
-                          <SelectItem value="push">Push Notification</SelectItem>
-                          <SelectItem value="letter">Γράμμα στη Διεύθυνση (Κρυπτογραφημένη)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <Button className="w-full" onClick={handleSendAssistance} disabled={!assistanceType || !sendMethod}>
-                      <Send className="w-4 h-4 mr-2" />
-                      Αποστολή Ειδοποίησης
-                    </Button>
-
-                    <p className="text-xs text-muted-foreground text-center">
-                      Η διεύθυνση του πολίτη είναι κρυπτογραφημένη και δεν είναι ορατή στους διαχειριστές
-                    </p>
+              <div className="space-y-4 mt-4">
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Επίπεδο Κινδύνου:</span>
+                    <Badge variant={selectedCitizen ? getRiskBadgeVariant(selectedCitizen.risk) : "default"}>
+                      {selectedCitizen?.risk}
+                    </Badge>
                   </div>
-                )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Ηλικία:</span>
+                    <span className="font-medium">{selectedCitizen?.age}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Κύρια Αιτία:</span>
+                    <span className="font-medium">{selectedCitizen?.cause}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="assistance">Τύπος Βοήθειας</Label>
+                  <Select value={assistanceType} onValueChange={setAssistanceType}>
+                    <SelectTrigger id="assistance">
+                      <SelectValue placeholder="Επιλέξτε τύπο βοήθειας" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Οικονομική Βοήθεια">Οικονομική Βοήθεια</SelectItem>
+                      <SelectItem value="Επίδομα Στέγασης">Επίδομα Στέγασης</SelectItem>
+                      <SelectItem value="Επίδομα Ανεργίας">Επίδομα Ανεργίας</SelectItem>
+                      <SelectItem value="Κοινωνικό Παντοπωλείο">Κοινωνικό Παντοπωλείο</SelectItem>
+                      <SelectItem value="Ιατρική Φροντίδα">Ιατρική Φροντίδα</SelectItem>
+                      <SelectItem value="Συμβουλευτική">Συμβουλευτική</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="method">Μέθοδος Αποστολής</Label>
+                  <Select value={sendMethod} onValueChange={setSendMethod}>
+                    <SelectTrigger id="method">
+                      <SelectValue placeholder="Επιλέξτε μέθοδο" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sms">SMS</SelectItem>
+                      <SelectItem value="push">Push Notification</SelectItem>
+                      <SelectItem value="letter">Γράμμα στη Διεύθυνση (Κρυπτογραφημένη)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button className="w-full" onClick={handleSendAssistance} disabled={!assistanceType || !sendMethod}>
+                  <Send className="w-4 h-4 mr-2" />
+                  Αποστολή Ειδοποίησης
+                </Button>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  Η διεύθυνση του πολίτη είναι κρυπτογραφημένη και δεν είναι ορατή στους διαχειριστές
+                </p>
               </div>
             </DialogContent>
           </Dialog>
