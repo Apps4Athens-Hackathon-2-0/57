@@ -143,6 +143,39 @@ const Admin = () => {
           </div>
         </div>
 
+        {/* Bar Chart - Areas List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Κατανομή Ατόμων Ανά Περιοχή</CardTitle>
+            <CardDescription>Αριθμός ατόμων σε κίνδυνο ανά περιοχή του Δήμου - Κάντε κλικ για λεπτομέρειες</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart 
+                data={mockBarData}
+                onClick={(data) => {
+                  if (data && data.activePayload && data.activePayload[0]) {
+                    setSelectedArea(data.activePayload[0].payload.area);
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="area" stroke="hsl(var(--muted-foreground))" />
+                <YAxis stroke="hsl(var(--muted-foreground))" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))", 
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "8px"
+                  }} 
+                />
+                <Bar dataKey="count" fill={CHART_COLORS.primary} radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
@@ -291,39 +324,6 @@ const Admin = () => {
             </CardContent>
           </Card>
         </div>
-
-        {/* Bar Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Κατανομή Ατόμων Ανά Περιοχή</CardTitle>
-            <CardDescription>Αριθμός ατόμων σε κίνδυνο ανά περιοχή του Δήμου</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart 
-                data={mockBarData}
-                onClick={(data) => {
-                  if (data && data.activePayload && data.activePayload[0]) {
-                    setSelectedArea(data.activePayload[0].payload.area);
-                  }
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="area" stroke="hsl(var(--muted-foreground))" />
-                <YAxis stroke="hsl(var(--muted-foreground))" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: "hsl(var(--card))", 
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px"
-                  }} 
-                />
-                <Bar dataKey="count" fill={CHART_COLORS.primary} radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
 
         {/* Citizens Table */}
         <Card>
