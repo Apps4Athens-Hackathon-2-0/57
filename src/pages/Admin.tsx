@@ -61,44 +61,43 @@ const mockBarData = [
   { area: "Πετράλωνα", count: 228 },
 ];
 
-const mockCitizens = [
-  {
-    id: "C-2024-001",
-    area: "Κέντρο Αθήνας",
-    age: 42,
-    risk: "Υψηλός",
-    cause: "Απώλεια Εργασίας",
-    support: "Οικονομική Βοήθεια",
-  },
-  {
-    id: "C-2024-002",
-    area: "Εξάρχεια",
-    age: 35,
-    risk: "Μέτριος",
-    cause: "Οικονομικά Προβλήματα",
-    support: "Συμβουλευτική",
-  },
-  { id: "C-2024-003", area: "Κυψέλη", age: 58, risk: "Υψηλός", cause: "Υγεία/Αναπηρία", support: "Ιατρική Φροντίδα" },
-  { id: "C-2024-004", area: "Παγκράτι", age: 29, risk: "Χαμηλός", cause: "Οικογενειακά Θέματα", support: "Στέγαση" },
-  {
-    id: "C-2024-005",
-    area: "Πατήσια",
-    age: 51,
-    risk: "Υψηλός",
-    cause: "Απώλεια Εργασίας",
-    support: "Επαγγελματική Κατάρτιση",
-  },
-  {
-    id: "C-2024-006",
-    area: "Κολωνάκι",
-    age: 38,
-    risk: "Μέτριος",
-    cause: "Οικονομικά Προβλήματα",
-    support: "Οικονομική Βοήθεια",
-  },
-  { id: "C-2024-007", area: "Γκάζι", age: 45, risk: "Μέτριος", cause: "Απώλεια Εργασίας", support: "Συμβουλευτική" },
-  { id: "C-2024-008", area: "Πετράλωνα", age: 33, risk: "Υψηλός", cause: "Στέγαση", support: "Κοινωνικό Παντοπωλείο" },
-];
+const generateCitizens = () => {
+  const areas = [
+    { name: "Κέντρο", count: 362 },
+    { name: "Εξάρχεια", count: 268 },
+    { name: "Κυψέλη", count: 411 },
+    { name: "Παγκράτι", count: 205 },
+    { name: "Πατήσια", count: 620 },
+    { name: "Κολωνάκι", count: 158 },
+    { name: "Γκάζι", count: 295 },
+    { name: "Πετράλωνα", count: 228 },
+  ];
+  
+  const risks = ["Υψηλός", "Μέτριος", "Χαμηλός"];
+  const causes = ["Απώλεια Εργασίας", "Στέγαση", "Υγεία/Αναπηρία", "Οικογενειακά Θέματα", "Άλλο"];
+  const supports = ["Οικονομική Βοήθεια", "Συμβουλευτική", "Ιατρική Φροντίδα", "Στέγαση", "Επαγγελματική Κατάρτιση", "Κοινωνικό Παντοπωλείο"];
+  
+  const citizens = [];
+  let idCounter = 1;
+  
+  for (const area of areas) {
+    for (let i = 0; i < area.count; i++) {
+      citizens.push({
+        id: `C-2024-${String(idCounter).padStart(4, '0')}`,
+        area: area.name,
+        age: Math.floor(Math.random() * 50) + 20,
+        risk: risks[Math.floor(Math.random() * risks.length)],
+        cause: causes[Math.floor(Math.random() * causes.length)],
+        support: supports[Math.floor(Math.random() * supports.length)],
+      });
+      idCounter++;
+    }
+  }
+  
+  return citizens;
+};
+
+const mockCitizens = generateCitizens();
 
 const Admin = () => {
   const [filter, setFilter] = useState("Όλοι");
